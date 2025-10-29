@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BYTE - Clocks</title>
+    <link rel="stylesheet" href="chatbot-styles.css">
+    <style>
+        body { background:#d8d8d8; font-family: Arial, sans-serif; }
+        .wrap { max-width: 900px; margin: 40px auto; background:#c8c8c8; border:3px solid #888; border-radius:16px; padding:24px; }
+        .tabs { display:flex; gap:10px; margin-bottom:16px; flex-wrap: wrap; }
+        .btn { padding:10px 14px; border:2px solid #888; border-radius:10px; background:#a8a8a8; font-weight:700; cursor:pointer; }
+        .btn:hover { filter:brightness(0.95); }
+        .section { display:none; }
+        .section.active { display:block; }
+        .row { display:flex; gap:12px; margin:12px 0; align-items:center; flex-wrap: wrap; }
+        .num { width:110px; padding:10px; border:2px solid #888; border-radius:10px; background:#e8e8e8; text-align:center; font-weight:700; }
+        .pill { padding:8px 12px; border:2px solid #888; border-radius:999px; background:#b8f0b8; font-weight:700; }
+        .card { background:#e8e8e8; border:2px solid #888; border-radius:14px; padding:16px; }
+
+        /* Digital clock */
+        .clock-display { font-size: 3rem; font-weight: 900; text-align:center; padding: 16px 24px; border:2px solid #888; border-radius:12px; background:#ffffff; letter-spacing: 2px; }
+        .options { display:flex; gap:10px; align-items:center; justify-content:center; margin-top:12px; }
+        label.switch { display:inline-flex; align-items:center; gap:8px; font-weight:700; }
+        select { padding:8px 10px; border:2px solid #888; border-radius:8px; background:#f0f0f0; font-weight:700; }
+
+        /* Pomodoro visuals (flat card with progress bar) */
+        .pomo-display { font-size: 3rem; font-weight: 900; text-align:center; padding: 16px 24px; border:2px solid #888; border-radius:12px; background:#ffffff; letter-spacing: 2px; min-width: 260px; }
+        .pbar { width: 100%; height: 12px; background:#eee; border:2px solid #888; border-radius: 999px; overflow: hidden; }
+        .pbar .bar { height: 100%; width: 0%; background: linear-gradient(90deg, #98e2b6, #4ade80); transition: width 0.3s ease; }
+        .pomo-controls { display:flex; gap:10px; justify-content:center; flex-wrap: wrap; }
+
+        /* Timer card */
+        .timer-card { display:flex; align-items:center; justify-content:center; gap:16px; }
+        .timer-display { font-size:56px; font-weight:900; padding:10px 18px; border:2px solid #888; border-radius:12px; background:#fff; min-width:200px; text-align:center; }
+    </style>
+    <script>
+        // Digital clock helpers
+        let hour12 = true;
+        function setMode(sel){ hour12 = (sel.value === '12'); updateDigital(); }
+        function updateDigital(){
+            const el = document.getElementById('digitalNow');
+            const opts = { hour12: hour12, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            el.textContent = new Date().toLocaleTimeString([], opts);
+        }
+
+        // Timer
+        let timerId = null, timerLeft = 0, timerTotal = 0;
+        function startTimer(){
+            const m = parseInt(document.getElementById('timerMin').value||'0',10);
+            const s = parseInt(document.getElementById('timerSec').value||'0',10);
+            timerLeft = m*60 + s;
+            timerTotal = timerLeft;
+            updateTimerDisplay();
+            if (timerId) clearInterval(timerId);
+            timerId = setInterval(()=>{ if (timerLeft>0){ timerLeft--; updateTimerDisplay(); } else { clearInterval(timerId); alert('Timer finished!'); } }, 1000);
+        }
+        function stopTimer(){ if (timerId) clearInterval(timerId); }
+        function resetTimer(){ stopTimer(); timerLeft = 0; timerTotal = 0; updateTimerDisplay(); }
+        function updateTimerDisplay(){
+            const mm = Math.floor(timerLeft/60).toString().padStart(2,'0');
+            const ss = (timerLeft%60).toString().padStart(2,'0');
+            document.getElementById('timerDisplay').textContent = `${mm}:${ss}`;
+            const pct = timerTotal>0 ? Math.min(100, Math.max(0, ((timerTotal - timerLeft)/timerTotal)*100)) : 0;
+            const bar = document.getElementById('timerBar');
+            if (bar) bar.style.width = pct + '%';
+        }
+
+        // Pomodoro
+        let pomoId = null, pomoLeft = 0, pomoMode = 'focus', focusM=25, breakM=5;
+        function applyPomoSettings(){ focusM = parseInt(document.getElementById('pFocus').value||'25',10); breakM = parseInt(document.getElementById('pBreak').value||'5',10); }
+        function startPomodoro(){ applyPomoSettings(); switchPomo('focus'); if (pomoId) clearInterval(pomoId); pomoId = setInterval(pomoTick, 1000); }
+        function stopPomodoro(){ if (pomoId) clearInterval(pomoId); }
+        function resetPomodoro(){ stopPomodoro(); switchPomo('focus'); }
+        function switchPomo(mode){ pomoMode = mode; pomoLeft = (mode==='focus'? focusM: breakM)*60; updatePomoDisplay(); }
+        function pomoTick(){ if (pomoLeft>0){ pomoLeft--; updatePomoDisplay(); } else { if (pomoMode==='focus'){ alert('Focus done! Break time.'); switchPomo('break'); } else { alert('Break done! Back to focus.'); switchPomo('focus'); } } }
+        function updatePomoDisplay(){
+            const total = (pomoMode==='focus'? focusM: breakM)*60;
+            const mm=Math.floor(pomoLeft/60).toString().padStart(2,'0');
+            const ss=(pomoLeft%60).toString().padStart(2,'0');
+            document.getElementById('pomoDisplay').textContent=`${mm}:${ss}`;
+            document.getElementById('pomoMode').textContent = pomoMode.toUpperCase();
+            const pct = total>0 ? Math.min(100, Math.max(0, ((total - pomoLeft)/total)*100)) : 0;
+            const bar = document.getElementById('pomoBar');
+            if (bar) bar.style.width = pct + '%';
+        }
+
+        function showTab(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        document.addEventListener('DOMContentLoaded', ()=>{ showTab('tab-digital'); updateDigital(); setInterval(updateDigital, 500); });
+    </script>
+</head>
+<body>
+    <div class="wrap">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h2 style="margin:0;">⏱️ Clocks</h2>
+            <button class="btn" onclick="window.location.href='chatbot.html'">Back</button>
+        </div>
+        <div class="tabs">
+            <button class="btn" onclick="showTab('tab-digital')">Digital</button>
+            <button class="btn" onclick="showTab('tab-pomodoro')">Pomodoro</button>
+            <button class="btn" onclick="showTab('tab-timer')">Timer</button>
+        </div>
+
+        <div id="tab-digital" class="section">
+            <div class="card" style="margin-bottom:12px;">
+                <div class="options">
+                    <label class="switch">Format:
+                        <select onchange="setMode(this)">
+                            <option value="12" selected>12-hour</option>
+                            <option value="24">24-hour</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="clock-display" id="digitalNow">--:--:--</div>
+        </div>
+
+        <div id="tab-pomodoro" class="section">
+            <div class="card" style="margin-bottom:12px;">
+                <div class="row" style="justify-content:center;">
+                    <span class="pill" id="pomoMode">FOCUS</span>
+                </div>
+                <div class="row" style="justify-content:center;">
+                    <div class="pomo-display" id="pomoDisplay">25:00</div>
+                </div>
+                <div class="row">
+                    <div class="pbar" style="flex:1;">
+                        <div class="bar" id="pomoBar"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <label>Focus (min): <input class="num" id="pFocus" type="number" value="25" min="1"></label>
+                <label>Break (min): <input class="num" id="pBreak" type="number" value="5" min="1"></label>
+            </div>
+            <div class="pomo-controls">
+                <button class="btn" onclick="startPomodoro()">Start</button>
+                <button class="btn" onclick="stopPomodoro()">Stop</button>
+                <button class="btn" onclick="resetPomodoro()">Reset</button>
+            </div>
+        </div>
+
+        <div id="tab-timer" class="section">
+            <div class="card" style="padding:20px;">
+                <div class="timer-card">
+                    <div class="timer-display" id="timerDisplay">00:00</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label>Minutes <input class="num" id="timerMin" type="number" value="0" min="0"></label>
+                        <label>Seconds <input class="num" id="timerSec" type="number" value="0" min="0" max="59"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="pbar" style="flex:1;">
+                        <div class="bar" id="timerBar"></div>
+                    </div>
+                </div>
+                <div class="row" style="justify-content:center;">
+                    <button class="btn" onclick="startTimer()">Start</button>
+                    <button class="btn" onclick="stopTimer()">Stop</button>
+                    <button class="btn" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
