@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BYTE - Smart Learning Assistant</title>
+    <link rel="stylesheet" href="homepage-styles.css">
+</head>
+<body>
+    <!-- Homepage -->
+    <div class="homepage" id="homepage">
+        <h1 class="logo">BYTE</h1>
+        <button class="start-btn" onclick="goToAuth()">START NOW</button>
+        <div class="download-icon" onclick="openSlidingPage()"></div>
+    </div>
+
+    <!-- Sliding Page (About) -->
+    <div class="sliding-page" id="slidingPage">
+        <div class="close-btn" onclick="closeSlidingPage()">×</div>
+        
+        <!-- About Section -->
+        <div class="about-section">
+            <h2 class="about-title">ABOUT BYTE</h2>
+            <p class="about-intro">Introducing Byte – a smart, student-friendly chatbot by Team DynamiX to enhance learning:</p>
+            
+            <ul class="features-list">
+                <li>Q&A Support: Answers academic questions</li>
+                <li>Draw-on-Screen: Solve problems visually</li>
+                <li>Speech-to-Text: Hands-free interaction</li>
+                <li>File Upload: Submit docs with questions</li>
+                <li>Scientific Calculator: Instant math solutions</li>
+                <li>To-Do List: Built-in task manager</li>
+            </ul>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-section">
+            <h2 class="team-title">MEET THE FOUNDERS</h2>
+            <div class="team-grid">
+
+                <!-- Aryan Arya -->
+                <div class="team-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="tablet-mockup">
+                                <div class="tablet-screen">
+                                    <img src="images/aryan.jpeg" alt="Aryan Arya" style="width:100%; height:100%; object-fit:cover; border-radius:15px;">
+                                </div>
+                            </div>
+                            <div class="member-name">Aryan Arya</div>
+                            <div class="member-role">Click to learn more</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="member-details">
+                                <h3> Aryan Arya </h3>
+                                <p><strong>Role:</strong> Back End & Front End Manager </p>
+                                <p><strong>Experience:</strong> 5 years </p>
+                                <p><strong>Education:</strong> 11th Grade </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Girik Kashyap -->
+                <div class="team-card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="tablet-mockup">
+                                <div class="tablet-screen">
+                                    <img src="images/girik.jpeg" alt="Girik Kashyap" style="width:100%; height:100%; object-fit:cover; border-radius:15px;">
+                                </div>
+                            </div>
+                            <div class="member-name">Girik Kashyap</div>
+                            <div class="member-role">Click to learn more</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="member-details">
+                                <h3> Girik Kashyap</h3>
+                                <p><strong>Role:</strong> UI & Python Developer</p>
+                                <p><strong>Experience:</strong> 2 years</p>
+                                <p><strong>Education:</strong> 11th Grade</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="homepage-script.js"></script>
+</body>
+</html>

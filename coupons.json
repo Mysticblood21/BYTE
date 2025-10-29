@@ -1,0 +1,16 @@
+[
+  {
+    "code": "SCHOOL2024",
+    "school_name": "BBPS NOIDA",
+    "school_domain": "nd.balbharati.org",
+    "is_active": true,
+    "max_uses": 1000
+  },
+  {
+    "code": "UNIVERSITY2024",
+    "school_name": "Demo University",
+    "school_domain": "university.edu",
+    "is_active": true,
+    "max_uses": 500
+  }
+]

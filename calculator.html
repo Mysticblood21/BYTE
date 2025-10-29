@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BYTE - Calculator</title>
+    <link rel="stylesheet" href="chatbot-styles.css">
+    <style>
+        body { background:#d8d8d8; font-family: Arial, sans-serif; }
+        .wrap { max-width: 560px; margin: 40px auto; background:#c8c8c8; border:3px solid #888; border-radius:12px; padding:24px; }
+        .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .display { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+        .input { width:100%; padding:12px 14px; border:2px solid #888; border-radius:8px; background:#e8e8e8; font-size:1.05rem; }
+        #result { min-height: 24px; margin-top: 2px; color:#111; font-weight:600; padding:4px 2px; }
+        .grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
+        .btn { padding:14px; border:2px solid #888; background:#a8a8a8; border-radius:8px; font-weight:700; cursor:pointer; text-align:center; }
+        .btn.op { background:#b2b2ff; }
+        .btn.fn { background:#ffd59e; }
+        .btn.ctrl { background:#ffb3b3; }
+        .btn.equals { background:#98e2b6; grid-column: span 2; }
+        .btn.zero { grid-column: span 2; }
+        .btn:hover { filter: brightness(0.95); }
+    </style>
+    <script>
+        async function evalServer(expr){
+            const res = await fetch('/api/calc', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ expression: expr }) });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Calculation failed');
+            return data.result;
+        }
+        function insert(val){ const i = document.getElementById('expr'); i.value += val; i.focus(); }
+        function clr(){ const i = document.getElementById('expr'); i.value=''; document.getElementById('result').textContent=''; i.focus(); }
+        function bksp(){ const i = document.getElementById('expr'); i.value = i.value.slice(0, -1); i.focus(); }
+        async function calc(){
+            const i = document.getElementById('expr'); const out = document.getElementById('result');
+            const expr = (i.value||'').trim(); if(!expr){ out.textContent='Enter an expression'; return; }
+            out.textContent = 'Calculating...';
+            try { const r = await evalServer(expr); out.textContent = `Result: ${r}`; }
+            catch(e){ out.textContent = `Error: ${e.message}`; }
+        }
+        function back(){ window.history.length > 1 ? window.history.back() : window.location.href = 'chatbot.html'; }
+        document.addEventListener('DOMContentLoaded',()=>{ document.getElementById('expr').addEventListener('keydown',e=>{ if(e.key==='Enter'){ calc(); } }); });
+    </script>
+</head>
+<body>
+    <div class="wrap">
+        <div class="topbar">
+            <h2 style="margin:0">🧮 Scientific Calculator</h2>
+            <button class="btn" style="flex:none" onclick="back()">Back</button>
+        </div>
+        <div class="display">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input id="expr" class="input" placeholder="e.g., sin(pi/2) + sqrt(2) * 3^2" style="flex:1;">
+                <button class="btn" onclick="calc()" title="Submit">Submit</button>
+            </div>
+            <div id="result"></div>
+        </div>
+        <div class="grid">
+            <button class="btn ctrl" onclick="clr()">C</button>
+            <button class="btn ctrl" onclick="bksp()">⌫</button>
+            <button class="btn fn" onclick="insert('(')">(</button>
+            <button class="btn fn" onclick="insert(')')">)</button>
+
+            <button class="btn fn" onclick="insert('sin(')">sin</button>
+            <button class="btn fn" onclick="insert('cos(')">cos</button>
+            <button class="btn fn" onclick="insert('tan(')">tan</button>
+            <button class="btn fn" onclick="insert('sqrt(')">√</button>
+
+            <button class="btn" onclick="insert('7')">7</button>
+            <button class="btn" onclick="insert('8')">8</button>
+            <button class="btn" onclick="insert('9')">9</button>
+            <button class="btn op" onclick="insert('/')">÷</button>
+
+            <button class="btn" onclick="insert('4')">4</button>
+            <button class="btn" onclick="insert('5')">5</button>
+            <button class="btn" onclick="insert('6')">6</button>
+            <button class="btn op" onclick="insert('*')">×</button>
+
+            <button class="btn" onclick="insert('1')">1</button>
+            <button class="btn" onclick="insert('2')">2</button>
+            <button class="btn" onclick="insert('3')">3</button>
+            <button class="btn op" onclick="insert('-')">−</button>
+
+            <button class="btn zero" onclick="insert('0')">0</button>
+            <button class="btn" onclick="insert('.')">.</button>
+            <button class="btn op" onclick="insert('+')">+</button>
+
+            <button class="btn fn" onclick="insert('^')">^</button>
+            <button class="btn fn" onclick="insert('log(')">log</button>
+            <button class="btn fn" onclick="insert('exp(')">exp</button>
+            <button class="btn fn" onclick="insert('pi')">π</button>
+
+            <button class="btn equals" onclick="calc()">=</button>
+            <button class="btn fn equals" onclick="insert('e')">e</button>
+        </div>
+    </div>
+</body>
+</html>
+

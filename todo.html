@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BYTE - To‑Do List</title>
+    <link rel="stylesheet" href="chatbot-styles.css">
+    <style>
+        body { background:#d8d8d8; font-family: Arial, sans-serif; }
+        .wrapper { max-width: 800px; margin: 40px auto; background:#c8c8c8; border:3px solid #888; border-radius:12px; padding:24px; }
+        .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .title { font-size:1.6rem; font-weight:900; }
+        .actions { display:flex; gap:10px; }
+        .btn { background:#a8a8a8; border:2px solid #888; border-radius:8px; padding:10px 14px; cursor:pointer; font-weight:600; }
+        .btn:hover { background:#999; color:#fff; }
+        .task-input { display:flex; gap:10px; margin: 12px 0 20px; }
+        #newTaskInput { flex:1; padding:10px 12px; border:2px solid #888; border-radius:8px; background:#e8e8e8; }
+        #taskList { list-style:none; display:flex; flex-direction:column; gap:10px; }
+        .task-item { background:#b8b8b8; border:2px solid #888; border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:10px; }
+        .task-content { flex:1; }
+        .task-content.completed { text-decoration: line-through; color:#555; }
+        .small { font-size:0.9rem; }
+    </style>
+    <script>
+        let tasks = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await ensureAuth();
+            await loadTasks();
+            document.getElementById('newTaskInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+        });
+
+        async function ensureAuth() {
+            try {
+                const res = await fetch('/api/auth/me', { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    document.getElementById('userName').textContent = currentUser.name;
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                } else {
+                    document.getElementById('userName').textContent = 'Guest';
+                    document.getElementById('userEmail').textContent = 'Not signed in';
+                }
+            } catch (e) {
+                document.getElementById('userName').textContent = 'Guest';
+                document.getElementById('userEmail').textContent = 'Not signed in';
+            }
+        }
+
+        async function loadTasks() {
+            const res = await fetch('/api/tasks', { credentials: 'include' });
+            if (!res.ok) { alert('Failed to load tasks'); return; }
+            const data = await res.json();
+            tasks = data.tasks || [];
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            if (tasks.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'small';
+                li.textContent = 'No tasks yet. Add your first task!';
+                list.appendChild(li);
+                return;
+            }
+            tasks.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'task-item';
+                li.innerHTML = `
+                    <input type=\"checkbox\" ${t.is_completed ? 'checked' : ''} onchange=\"toggleTask(${t.id}, this.checked)\">
+                    <div class=\"task-content ${t.is_completed ? 'completed' : ''}\">${escapeHtml(t.content)}</div>
+                    <div style=\"display:flex; gap:8px;\">
+                        <button class=\"btn\" onclick=\"promptRename(${t.id})\">Rename</button>
+                        <button class=\"btn\" onclick=\"deleteTask(${t.id})\">Delete</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function promptRename(id){
+            const t = tasks.find(x=>x.id===id);
+            const nv = prompt('Rename task:', t ? t.content : '');
+            if (nv && nv.trim()) renameTask(id, nv.trim());
+        }
+
+        async function addTask() {
+            const input = document.getElementById('newTaskInput');
+            const content = (input.value || '').trim();
+            if (!content) return;
+            const res = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials:'include', body: JSON.stringify({ content }) });
+            if (!res.ok) { const err = await res.json().catch(()=>({error:'Add failed'})); alert(err.error || 'Failed to add task'); return; }
+            input.value = '';
+            await loadTasks();
+        }
+
+        async function toggleTask(id, completed) {
+            const res = await fetch(`/api/tasks/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials:'include', body: JSON.stringify({ is_completed: completed }) });
+            if (!res.ok) { alert('Failed to update task'); return; }
+            await loadTasks();
+        }
+
+        async function renameTask(id, content) {
+            content = (content || '').trim();
+            if (!content) { await loadTasks(); return; }
+            const res = await fetch(`/api/tasks/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials:'include', body: JSON.stringify({ content }) });
+            if (!res.ok) { alert('Failed to rename task'); return; }
+            await loadTasks();
+        }
+
+        async function deleteTask(id) {
+            const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE', credentials:'include' });
+            if (!res.ok) { alert('Failed to delete task'); return; }
+            await loadTasks();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+        }
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="title">📝 To‑Do List</div>
+            <div class="actions">
+                <button class="btn" onclick="window.location.href='chatbot.html'">Back to Chat</button>
+                <button class="btn" onclick="loadTasks()">Refresh</button>
+            </div>
+        </div>
+        <div class="small" style="margin-bottom:8px;">Logged in as: <strong id="userName">...</strong> (<span id="userEmail">...</span>)</div>
+        <div class="task-input">
+            <input id="newTaskInput" placeholder="Add a new task and press Enter">
+            <button class="btn" onclick="addTask()">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+</body>
+</html>
+

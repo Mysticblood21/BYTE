@@ -1,0 +1,368 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #e3e3e3;
+    overflow-x: hidden;
+    position: relative;
+    color: #222;
+}
+
+/* Homepage Styles */
+.homepage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #ededed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid #f5f5f5;
+    box-sizing: border-box;
+    z-index: 101;
+}
+
+.logo {
+    font-size: 6rem;
+    font-weight: 900;
+    color: #111;
+    letter-spacing: 4px;
+    margin-bottom: 60px;
+    text-align: center;
+}
+
+.start-btn {
+    padding: 20px 40px;
+    background: #c9c9c9;
+    color: #111;
+    border: 2px solid #a9a9a9;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-btn:hover {
+    background: #bdbdbd;
+    border-color: #9a9a9a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.download-icon {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: #c0c0c0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #adadad;
+}
+
+.download-icon:hover {
+    background: #b3b3b3;
+    transform: scale(1.1);
+}
+
+.download-icon::after {
+    content: '↓';
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: bold;
+}
+
+/* About/Sliding Page Styles */
+.sliding-page {
+    position: fixed;
+    top: 100%;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #f0f0f0;
+    transition: top 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1000;
+    border: 4px solid #f5f5f5;
+    box-sizing: border-box;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.sliding-page.active {
+    top: 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #a8a8a8;
+    border: 2px solid #888;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: #999;
+    transform: scale(1.1);
+}
+
+.about-section {
+    padding: 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #111;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.about-intro {
+    font-size: 1.2rem;
+    color: #2a2a2a;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.features-list {
+    list-style: none;
+    margin-bottom: 60px;
+}
+
+.features-list li {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 15px;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.features-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #777;
+    font-size: 1.2rem;
+}
+
+.team-section {
+    padding: 0 60px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.team-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #111;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.team-card {
+    width: 300px;
+    height: 400px;
+    perspective: 1000px;
+    margin: 0 auto;
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.team-card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    border: 2px solid #888;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-front {
+    background: #cfcfcf;
+}
+
+.card-back {
+    background: #c4c4c4;
+    transform: rotateY(180deg);
+}
+
+.tablet-mockup {
+    width: 200px;
+    height: 260px;
+    background: #333;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tablet-screen {
+    width: 180px;
+    height: 240px;
+    background: linear-gradient(135deg, #e7e7e7 0%, #d9d9d9 100%);
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50px;
+    opacity: 0.9;
+}
+
+.cloud-1 {
+    width: 60px;
+    height: 30px;
+    top: 30px;
+    left: 60px;
+}
+
+.cloud-2 {
+    width: 40px;
+    height: 20px;
+    top: 50px;
+    right: 40px;
+}
+
+.hills { display: none; }
+
+.member-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.member-role {
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.member-details {
+    font-size: 0.9rem;
+    color: #333;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.member-details h3 {
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.member-details p {
+    margin-bottom: 8px;
+}
+
+/* Ripple effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logo {
+        font-size: 4rem;
+    }
+
+    .about-section, .team-section {
+        padding: 30px 20px;
+    }
+
+    .about-title, .team-title {
+        font-size: 2.5rem;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .team-card {
+        width: 280px;
+        height: 380px;
+    }
+
+    .tablet-mockup {
+        width: 160px;
+        height: 220px;
+    }
+
+    .tablet-screen {
+        width: 140px;
+        height: 200px;
+    }
+}
