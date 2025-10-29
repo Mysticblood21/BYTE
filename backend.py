@@ -2153,7 +2153,7 @@ if __name__ == '__main__':
     print("STARTING: BYTE Server starting...")
     print("INFO: Server running at: http://127.0.0.1:5000/")
     try:         
-        app.run(debug=False, host='127.0.0.1', port=5000)      
+        app.run(host='0.0.0.0', port=5000)  
     except Exception as e:         
         print(f"ERROR: Server error: {e}")
         logging.error(f"Server error: {e}")     
